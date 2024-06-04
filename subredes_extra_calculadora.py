@@ -57,11 +57,11 @@ def calcular_subredes_por_hosts():
 
             result = (
                 f"\n{hosts_requeridos} host ({bits_host} bit)\n"
-                f"red {subred.network_address} {network_bin.split()[1]} → .{subred.network_address.packed[-1]}\n"
-                f"prim {subred.network_address + 1} {first_host_bin.split()[1]} → .{(subred.network_address + 1).packed[-1]}\n"
-                f"ult {subred.broadcast_address - 1} {last_host_bin.split()[1]} → .{(subred.broadcast_address - 1).packed[-1]}\n"
-                f"brod {subred.broadcast_address} {broadcast_bin.split()[1]} → .{subred.broadcast_address.packed[-1]}\n"
-                f"mask {prefijo_base} bit + {bits_host - (32 - prefijo_base)} bit → /{nuevo_prefijo} → {subred.netmask}"
+                f"Dirección de red: {subred.network_address} {network_bin.split()[1]} → .{subred.network_address.packed[-1]}\n"
+                f"Primera Asignable: {subred.network_address + 1} {first_host_bin.split()[1]} → .{(subred.network_address + 1).packed[-1]}\n"
+                f"Última Asignable: {subred.broadcast_address - 1} {last_host_bin.split()[1]} → .{(subred.broadcast_address - 1).packed[-1]}\n"
+                f"Broadcast: {subred.broadcast_address} {broadcast_bin.split()[1]} → .{subred.broadcast_address.packed[-1]}\n"
+                f"Máscara {prefijo_base} bit + {bits_host - (32 - prefijo_base)} bit → /{nuevo_prefijo} → {subred.netmask}"
             )
             messagebox.showinfo("Resultado", result)
         else:
