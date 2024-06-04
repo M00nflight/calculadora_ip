@@ -19,7 +19,7 @@ def obtener_siguiente_subred(base_red, prefijo_base, subredes_asignadas, hosts_r
             return subred
     return None
 
-def direccion_a_binario(direccion, prefijo, bits_host):
+def direccion_a_binario(direccion, bits_host):
     partes = str(direccion).split('.')
     binario = ''.join(f"{int(octeto):08b}" for octeto in partes)
     return f"{binario[:32 - bits_host]} {binario[32 - bits_host:]}"
@@ -50,19 +50,17 @@ def calcular_subredes_por_hosts():
             nuevo_prefijo = subred.prefixlen
             bits_host = 32 - nuevo_prefijo
 
+            network_bin = direccion_a_binario(subred.network_address, bits_host)
+            first_host_bin = direccion_a_binario(subred.network_address + 1, bits_host)
+            last_host_bin = direccion_a_binario(subred.broadcast_address - 1, bits_host)
+            broadcast_bin = direccion_a_binario(subred.broadcast_address, bits_host)
+
             result = (
-                f"\nSubred asignada:\n"
-                f"Dirección de Red: {subred.network_address} ({bits_host} bits)\n"
-                f"Primera dirección asignable: {subred.network_address + 1}\n"
-                f"Última dirección asignable: {subred.broadcast_address - 1}\n"
-                f"Dirección de broadcast: {subred.broadcast_address}\n"
-                f"Máscara de subred: {subred.netmask}\n"
-                f"Total de direcciones IP válidas o usables: {subred.num_addresses - 2}\n"
-                f"{hosts_requeridos} hosts ({bits_host} bits)\n"
-                f"red {subred.network_address} {direccion_a_binario(subred.network_address, nuevo_prefijo, bits_host).split()[1]}\n"
-                f"prim {subred.network_address + 1} {direccion_a_binario(subred.network_address + 1, nuevo_prefijo, bits_host).split()[1]}\n"
-                f"ult {subred.broadcast_address - 1} {direccion_a_binario(subred.broadcast_address - 1, nuevo_prefijo, bits_host).split()[1]}\n"
-                f"brod {subred.broadcast_address} {direccion_a_binario(subred.broadcast_address, nuevo_prefijo, bits_host).split()[1]}\n"
+                f"\n{hosts_requeridos} host ({bits_host} bit)\n"
+                f"red {subred.network_address} {network_bin.split()[1]} → .{subred.network_address.packed[-1]}\n"
+                f"prim {subred.network_address + 1} {first_host_bin.split()[1]} → .{(subred.network_address + 1).packed[-1]}\n"
+                f"ult {subred.broadcast_address - 1} {last_host_bin.split()[1]} → .{(subred.broadcast_address - 1).packed[-1]}\n"
+                f"brod {subred.broadcast_address} {broadcast_bin.split()[1]} → .{subred.broadcast_address.packed[-1]}\n"
                 f"mask {prefijo_base} bit + {bits_host - (32 - prefijo_base)} bit → /{nuevo_prefijo} → {subred.netmask}"
             )
             messagebox.showinfo("Resultado", result)
@@ -73,6 +71,7 @@ def calcular_subredes_por_hosts():
         result = "\nSubredes asignadas:\n" + "\n".join(str(subred) for subred in subredes_asignadas)
         messagebox.showinfo("Subredes Asignadas", result)
 
+# CALCULAR SUBREDES POR INTERFAZ ROUTER
 def calcular_subredes_por_interfaces():
     network_address = simpledialog.askstring("Input", "Ingrese la dirección de red a distribuir (por ejemplo, 172.16.20.0/24):")
     interfaces_input = simpledialog.askstring("Input", "Ingrese las interfaces del router separadas por comas (por ejemplo, G0/0,G0/1):")
